@@ -47,33 +47,40 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(widget.title),
       ),
       body: Center(
-        child: Column(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
-          const Text(
-            'You have pushed the button this many times:',
-          ),
-          Text(
-            '$_counter',
-            style: Theme.of(context).textTheme.headlineMedium,
-          ),
-          SizedBox(
-            height: 100,
-            width: 300,
-            child: SmartGanttLayoutView(
-              events: const [
-                (left: 0.0, length: 0.1, height: 100, top: 0.0),
-                (left: 0.2, length: 0.2, height: 100, top: 0.0),
-                (left: 0.5, length: 0.1, height: 100, top: 0.0),
-                (left: 0.7, length: 0.1, height: 100, top: 0.0),
-              ],
-              ganttCardBuilder: (index) {
-                return const GanttCard(
-                  width: double.infinity,
-                  color: Colors.red,
-                );
-              },
-            ),
-          ),
-        ]),
+        child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              const Text(
+                'You have pushed the button this many times:',
+              ),
+              Text(
+                '$_counter',
+                style: Theme.of(context).textTheme.headlineMedium,
+              ),
+              SizedBox(
+                height: 100,
+                width: 300,
+                child: SmartGanttLayoutView(
+                  algorithmType: GanttLayoutAlgorithmType.smartSpacing,
+                  events: const [
+                    (left: 0, length: 0.2),
+                    (left: 0.1, length: 0.5),
+                    (left: 0.3, length: 0.2),
+                    (left: 0.3, length: 0.2),
+                    (left: 0.7, length: 0.05),
+                    (left: 0.7, length: 0.2),
+                    (left: 0.8, length: 0.05),
+                  ],
+                  ganttCardBuilder: (index) {
+                    return GanttCard(
+                      index + 1,
+                      width: double.infinity,
+                      color: Colors.red,
+                    );
+                  },
+                ),
+              ),
+            ]),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _incrementCounter,
@@ -85,11 +92,13 @@ class _MyHomePageState extends State<MyHomePage> {
 }
 
 class GanttCard extends StatelessWidget {
+  final int index;
   final double? height;
   final double width;
   final Color color;
 
-  const GanttCard({super.key, this.height, required this.width, required this.color});
+  const GanttCard(this.index,
+      {super.key, this.height, required this.width, required this.color});
 
   @override
   Widget build(BuildContext context) {
@@ -97,6 +106,7 @@ class GanttCard extends StatelessWidget {
       height: height,
       width: width,
       color: color,
+      child: Text('$index'),
     );
   }
 }

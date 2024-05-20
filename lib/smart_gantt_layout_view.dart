@@ -4,17 +4,25 @@ import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+import 'gantt_layout_algorithm.dart';
+
+enum GanttLayoutAlgorithmType { stacking, smartSpacing }
+
 class SmartGanttLayoutView extends StatefulWidget {
   final List<GanttEventData> events;
   final Widget Function(int index) ganttCardBuilder;
 
-  const SmartGanttLayoutView({super.key, required this.events, required this.ganttCardBuilder});
+  final GanttLayoutAlgorithmType algorithmType;
+
+  const SmartGanttLayoutView(
+      {super.key,
+      required this.events,
+      required this.ganttCardBuilder,
+      this.algorithmType = GanttLayoutAlgorithmType.smartSpacing});
 
   @override
   State<SmartGanttLayoutView> createState() => _SmartGanttLayoutViewState();
 }
-
-typedef GanttEventData = ({double left, double length, double height, double top});
 
 class _SmartGanttLayoutViewState extends State<SmartGanttLayoutView> {
   @override
@@ -29,7 +37,8 @@ class _SmartGanttLayoutViewState extends State<SmartGanttLayoutView> {
             top: 0,
             bottom: 0,
             child: CustomMultiChildLayout(
-              delegate: GanttLayoutDelegate(widget.events),
+              delegate:
+                  GanttLayoutDelegate(widget.events, widget.algorithmType),
               children: [
                 ...widget.events.mapIndexed((index, e) => LayoutId(
                       id: index,
@@ -44,38 +53,32 @@ class _SmartGanttLayoutViewState extends State<SmartGanttLayoutView> {
 }
 
 class GanttLayoutDelegate extends MultiChildLayoutDelegate {
-  final List<GanttEventData> events;
+  final GanttLayoutAlgorithm ganttLayoutAlgorithm;
 
-  GanttLayoutDelegate(this.events);
+  GanttLayoutDelegate(
+      List<GanttEventData> events, GanttLayoutAlgorithmType algorithmType)
+      : ganttLayoutAlgorithm =
+            algorithmType == GanttLayoutAlgorithmType.stacking
+                ? GanttLayoutStackingAlgorithm(events)
+                : GanttLayoutSmartSpacingAlgorithm(events);
 
   @override
   void performLayout(Size size) {
-    final int totalEvents = events.length;
-    final double heightPerEvent = calculateHeight(totalEvents, size);
+    final eventsLayout = ganttLayoutAlgorithm.getLayoutList();
 
-    events.forEachIndexed((index, event) {
-      final double top = calculateTop(index, totalEvents, size);
-      final double height = heightPerEvent;
-
-      final left = event.left;
-      final length = event.length;
-      layoutChild(index, BoxConstraints.tight(Size(size.width * length, height)));
-      positionChild(index, Offset(size.width * left, top));
+    eventsLayout.forEachIndexed((index, event) {
+      layoutChild(
+          index,
+          BoxConstraints.tight(
+              Size(size.width * event.length, size.height * event.height)));
+      positionChild(
+          index, Offset(size.width * event.left, size.height * event.top));
     });
-  }
-
-  double calculateHeight(int totalEvents, Size size) {
-    final availableHeight = size.height;
-    return availableHeight / totalEvents;
-  }
-
-  double calculateTop(int index, int totalEvents, Size size) {
-    final availableHeight = size.height;
-    return index * (availableHeight / totalEvents);
   }
 
   @override
   bool shouldRelayout(GanttLayoutDelegate oldDelegate) {
-    return listEquals(events, oldDelegate.events);
+    return listEquals(
+        ganttLayoutAlgorithm.events, oldDelegate.ganttLayoutAlgorithm.events);
   }
 }
