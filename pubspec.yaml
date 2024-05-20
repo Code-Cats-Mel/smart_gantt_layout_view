@@ -1,7 +1,7 @@
 name: smart_gantt_layout_view
 description: "A smart gantt layout view that auto adjust the layout to handle overlapping."
 version: 0.0.2
-homepage:
+homepage: https://github.com/Code-Cats-Mel
 
 environment:
   sdk: '>=3.3.3 <4.0.0'
