@@ -8,14 +8,13 @@ class SmartGanttLayoutView extends StatefulWidget {
   final List<GanttEventData> events;
   final Widget Function(int index) ganttCardBuilder;
 
-  const SmartGanttLayoutView(
-      {super.key, required this.events, required this.ganttCardBuilder});
+  const SmartGanttLayoutView({super.key, required this.events, required this.ganttCardBuilder});
 
   @override
   State<SmartGanttLayoutView> createState() => _SmartGanttLayoutViewState();
 }
 
-typedef GanttEventData = ({double left, double length});
+typedef GanttEventData = ({double left, double length, double height, double top});
 
 class _SmartGanttLayoutViewState extends State<SmartGanttLayoutView> {
   @override
@@ -51,14 +50,28 @@ class GanttLayoutDelegate extends MultiChildLayoutDelegate {
 
   @override
   void performLayout(Size size) {
-    double height = size.height / 2;
+    final int totalEvents = events.length;
+    final double heightPerEvent = calculateHeight(totalEvents, size);
 
     events.forEachIndexed((index, event) {
-      layoutChild(
-          index, BoxConstraints.tight(Size(size.width * event.length, height)));
-      positionChild(
-          index, Offset(size.width * event.left, index % 2 == 0 ? 0 : height));
+      final double top = calculateTop(index, totalEvents, size);
+      final double height = heightPerEvent;
+
+      final left = event.left;
+      final length = event.length;
+      layoutChild(index, BoxConstraints.tight(Size(size.width * length, height)));
+      positionChild(index, Offset(size.width * left, top));
     });
+  }
+
+  double calculateHeight(int totalEvents, Size size) {
+    final availableHeight = size.height;
+    return availableHeight / totalEvents;
+  }
+
+  double calculateTop(int index, int totalEvents, Size size) {
+    final availableHeight = size.height;
+    return index * (availableHeight / totalEvents);
   }
 
   @override
