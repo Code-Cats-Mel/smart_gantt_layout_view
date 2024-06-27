@@ -27,28 +27,17 @@ class SmartGanttLayoutView extends StatefulWidget {
 class _SmartGanttLayoutViewState extends State<SmartGanttLayoutView> {
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      alignment: Alignment.centerLeft,
-      children: [
-        if (widget.events.isNotEmpty)
-          Positioned(
-            left: 0,
-            right: 0,
-            top: 0,
-            bottom: 0,
-            child: CustomMultiChildLayout(
-              delegate:
-                  GanttLayoutDelegate(widget.events, widget.algorithmType),
-              children: [
-                ...widget.events.mapIndexed((index, e) => LayoutId(
-                      id: index,
-                      child: widget.ganttCardBuilder(index),
-                    )),
-              ],
-            ),
-          ),
-      ],
-    );
+    return widget.events.isNotEmpty
+        ? CustomMultiChildLayout(
+            delegate: GanttLayoutDelegate(widget.events, widget.algorithmType),
+            children: [
+              ...widget.events.mapIndexed((index, e) => LayoutId(
+                    id: index,
+                    child: widget.ganttCardBuilder(index),
+                  )),
+            ],
+          )
+        : const SizedBox.shrink();
   }
 }
 
