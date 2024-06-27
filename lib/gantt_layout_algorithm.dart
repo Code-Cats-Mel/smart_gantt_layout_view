@@ -2,8 +2,9 @@ import 'dart:math';
 
 import 'package:collection/collection.dart';
 
-typedef GanttEventData = ({double left, double length});
+typedef GanttEventData = ({int index, double left, double length});
 typedef GanttLayoutData = ({
+  int index,
   double left,
   double length,
   double top,
@@ -20,13 +21,13 @@ abstract interface class GanttLayoutAlgorithm {
   List<List<GanttEventData>> groupOverlappingEvents(
       List<GanttEventData> events) {
     final groupedEvents = <List<GanttEventData>>[];
-    final sortedEvents = events.toList()
-      ..sort((a, b) => a.left.compareTo(b.left));
+    events.sort((a, b) => a.left.compareTo(b.left));
 
-    for (final event in sortedEvents) {
+    for (final event in events) {
       bool added = false;
       for (final group in groupedEvents) {
         final total = group.reduce((value, element) => (
+              index: -1,
               left: min(value.left, element.left),
               length: max(value.left + value.length,
                       element.left + element.length) -
@@ -62,6 +63,7 @@ class GanttLayoutStackingAlgorithm extends GanttLayoutAlgorithm {
       final height = 1.0 / group.length;
       final layout = group.mapIndexed((index, e) {
         return (
+          index: e.index,
           left: e.left,
           length: e.length,
           top: height * index,
@@ -117,6 +119,7 @@ class GanttLayoutSmartSpacingAlgorithm extends GanttLayoutAlgorithm {
       final groupLayout = groupedEvents
           .mapIndexed((rowIndex, row) => row.map((e) {
                 return (
+                  index: e.index,
                   left: e.left,
                   length: e.length,
                   top: height * rowIndex,

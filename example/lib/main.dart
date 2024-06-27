@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:smart_gantt_layout_view/smart_gantt_layout_view.dart';
 
@@ -62,18 +63,21 @@ class _MyHomePageState extends State<MyHomePage> {
                 width: 300,
                 child: SmartGanttLayoutView(
                   algorithmType: GanttLayoutAlgorithmType.smartSpacing,
-                  events: const [
-                    (left: 0, length: 0.2),
-                    // (left: 0.1, length: 0.5),
-                    (left: 0.1, length: 0.2),
+                  events: [
+                    (left: 0.0, length: 0.2),
                     (left: 0.3, length: 0.2),
+                    (left: 0.1, length: 0.5),
+                    (left: 0.1, length: 0.2),
                     (left: 0.3, length: 0.2),
                     (left: 0.3, length: 0.2),
                     (left: 0.7, length: 0.05),
                     (left: 0.7, length: 0.2),
                     (left: 0.8, length: 0.05),
                     (left: 0.8, length: 0.3),
-                  ],
+                  ]
+                      .mapIndexed((index, e) =>
+                          (index: index, left: e.left, length: e.length))
+                      .toList(),
                   ganttCardBuilder: (index) {
                     return GanttCard(
                       index + 1,

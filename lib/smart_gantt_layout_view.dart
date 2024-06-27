@@ -65,20 +65,19 @@ class GanttLayoutDelegate extends MultiChildLayoutDelegate {
   @override
   void performLayout(Size size) {
     final eventsLayout = ganttLayoutAlgorithm.getLayoutList();
-
-    eventsLayout.forEachIndexed((index, event) {
+    for (var event in eventsLayout) {
       layoutChild(
-          index,
+          event.index,
           BoxConstraints.tight(
               Size(size.width * event.length, size.height * event.height)));
-      positionChild(
-          index, Offset(size.width * event.left, size.height * event.top));
-    });
+      positionChild(event.index,
+          Offset(size.width * event.left, size.height * event.top));
+    }
   }
 
   @override
   bool shouldRelayout(GanttLayoutDelegate oldDelegate) {
-    return listEquals(
+    return !listEquals(
         ganttLayoutAlgorithm.events, oldDelegate.ganttLayoutAlgorithm.events);
   }
 }
