@@ -171,4 +171,28 @@ void main() {
       (index: 9, left: 0.8, length: 0.3, top: 2.0 / 3, height: 1.0 / 3),
     ]);
   });
+
+  test('get smartLayout - keep order', () {
+    List<GanttEventData> events = [
+      (index: 0, left: 0.0, length: 0.2),
+      (index: 1, left: 0.3, length: 0.2),
+      (index: 2, left: 0.1, length: 0.5),
+      (index: 3, left: 0.1, length: 0.2),
+      (index: 4, left: 0.3, length: 0.2),
+      (index: 5, left: 0.3, length: 0.2),
+    ];
+
+    GanttLayoutSmartSpacingAlgorithm ganttLayoutAlgorithm =
+        GanttLayoutSmartSpacingAlgorithm(events);
+    final layout = ganttLayoutAlgorithm.getLayoutList();
+
+    expect(layout, [
+      (index: 0, left: 0.0, length: 0.2, top: 0.0, height: 1.0 / 4),
+      (index: 1, left: 0.3, length: 0.2, top: 0.0, height: 1.0 / 4),
+      (index: 2, left: 0.1, length: 0.5, top: 1.0 / 4, height: 1.0 / 4),
+      (index: 3, left: 0.1, length: 0.2, top: 2.0 / 4, height: 1.0 / 4),
+      (index: 4, left: 0.3, length: 0.2, top: 2.0 / 4, height: 1.0 / 4),
+      (index: 5, left: 0.3, length: 0.2, top: 3.0 / 4, height: 1.0 / 4),
+    ]);
+  });
 }
