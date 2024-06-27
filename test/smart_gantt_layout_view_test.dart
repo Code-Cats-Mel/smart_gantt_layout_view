@@ -116,4 +116,58 @@ void main() {
       (left: 0.7, length: 0.2, top: 0.0, height: 1.0),
     ]);
   });
+
+  test('get smartLayout - back to back should not overlapping', () {
+    List<GanttEventData> events = [
+      (left: 0, length: 0.2),
+      (left: 0.1, length: 0.2),
+      (left: 0.3, length: 0.2),
+      (left: 0.3, length: 0.2),
+      (left: 0.3, length: 0.2),
+    ];
+
+    GanttLayoutSmartSpacingAlgorithm ganttLayoutAlgorithm =
+        GanttLayoutSmartSpacingAlgorithm(events);
+    final layout = ganttLayoutAlgorithm.getLayoutList();
+
+    expect(layout, [
+      (left: 0.0, length: 0.2, top: 0.0, height: 1.0 / 2),
+      (left: 0.1, length: 0.2, top: 1.0 / 2, height: 1.0 / 2),
+      (left: 0.3, length: 0.2, top: 0.0 / 3, height: 1.0 / 3),
+      (left: 0.3, length: 0.2, top: 1.0 / 3, height: 1.0 / 3),
+      (left: 0.3, length: 0.2, top: 2.0 / 3, height: 1.0 / 3),
+    ]);
+  });
+
+  test('get smartLayout - more', () {
+    List<GanttEventData> events = [
+      (left: 0, length: 0.2),
+      (left: 0.1, length: 0.5),
+      (left: 0.1, length: 0.2),
+      (left: 0.3, length: 0.2),
+      (left: 0.3, length: 0.2),
+      (left: 0.3, length: 0.2),
+      (left: 0.7, length: 0.05),
+      (left: 0.7, length: 0.2),
+      (left: 0.8, length: 0.05),
+      (left: 0.8, length: 0.3),
+    ];
+
+    GanttLayoutSmartSpacingAlgorithm ganttLayoutAlgorithm =
+        GanttLayoutSmartSpacingAlgorithm(events);
+    final layout = ganttLayoutAlgorithm.getLayoutList();
+
+    expect(layout, [
+      (left: 0.0, length: 0.2, top: 0.0, height: 1.0 / 4),
+      (left: 0.3, length: 0.2, top: 0.0, height: 1.0 / 4),
+      (left: 0.1, length: 0.5, top: 1.0 / 4, height: 1.0 / 4),
+      (left: 0.1, length: 0.2, top: 2.0 / 4, height: 1.0 / 4),
+      (left: 0.3, length: 0.2, top: 2.0 / 4, height: 1.0 / 4),
+      (left: 0.3, length: 0.2, top: 3.0 / 4, height: 1.0 / 4),
+      (left: 0.7, length: 0.05, top: 0.0 / 3, height: 1.0 / 3),
+      (left: 0.8, length: 0.05, top: 0.0 / 3, height: 1.0 / 3),
+      (left: 0.7, length: 0.2, top: 1.0 / 3, height: 1.0 / 3),
+      (left: 0.8, length: 0.3, top: 2.0 / 3, height: 1.0 / 3),
+    ]);
+  });
 }

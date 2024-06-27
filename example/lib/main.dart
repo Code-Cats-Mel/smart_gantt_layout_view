@@ -64,12 +64,15 @@ class _MyHomePageState extends State<MyHomePage> {
                   algorithmType: GanttLayoutAlgorithmType.smartSpacing,
                   events: const [
                     (left: 0, length: 0.2),
-                    (left: 0.1, length: 0.5),
+                    // (left: 0.1, length: 0.5),
+                    (left: 0.1, length: 0.2),
+                    (left: 0.3, length: 0.2),
                     (left: 0.3, length: 0.2),
                     (left: 0.3, length: 0.2),
                     (left: 0.7, length: 0.05),
                     (left: 0.7, length: 0.2),
                     (left: 0.8, length: 0.05),
+                    (left: 0.8, length: 0.3),
                   ],
                   ganttCardBuilder: (index) {
                     return GanttCard(
@@ -103,9 +106,13 @@ class GanttCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      decoration: BoxDecoration(
+        color: color,
+        border: Border.all(color: Colors.black),
+      ),
       height: height,
       width: width,
-      color: color,
+      // color: color,
       child: Text('$index'),
     );
   }

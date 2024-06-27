@@ -1,4 +1,4 @@
-library smart_gantt_layout_view;
+import 'dart:math';
 
 import 'package:collection/collection.dart';
 
@@ -9,6 +9,8 @@ typedef GanttLayoutData = ({
   double top,
   double height
 });
+
+const double epsilon = 0.0000000000000001;
 
 abstract interface class GanttLayoutAlgorithm {
   List<GanttEventData> get events;
@@ -24,8 +26,13 @@ abstract interface class GanttLayoutAlgorithm {
     for (final event in sortedEvents) {
       bool added = false;
       for (final group in groupedEvents) {
-        final lastEvent = group.last;
-        if (event.left <= lastEvent.left + lastEvent.length) {
+        final total = group.reduce((value, element) => (
+              left: min(value.left, element.left),
+              length: max(value.left + value.length,
+                      element.left + element.length) -
+                  min(value.left, element.left),
+            ));
+        if (event.left + epsilon < total.left + total.length) {
           group.add(event);
           added = true;
           break;
@@ -45,28 +52,6 @@ class GanttLayoutStackingAlgorithm extends GanttLayoutAlgorithm {
   final List<GanttEventData> events;
 
   GanttLayoutStackingAlgorithm(this.events);
-
-  List<List<GanttEventData>> getLayoutListWithSmartSpacingManagement() {
-    List<List<GanttEventData>> groupedEvents = [];
-
-    for (final event in events) {
-      bool added = false;
-      for (final group in groupedEvents) {
-        final lastEvent = group.last;
-        if (event.left <= lastEvent.left + lastEvent.length) {
-          group.add(event);
-          added = true;
-          break;
-        }
-      }
-
-      if (!added) {
-        groupedEvents.add([event]);
-      }
-    }
-
-    return groupedEvents;
-  }
 
   @override
   List<GanttLayoutData> getLayoutList() {
@@ -105,7 +90,7 @@ class GanttLayoutSmartSpacingAlgorithm extends GanttLayoutAlgorithm {
       bool added = false;
       for (final rowGroup in groupedEventsByRow) {
         final lastEvent = rowGroup.last;
-        if (event.left > lastEvent.left + lastEvent.length) {
+        if (event.left + epsilon >= lastEvent.left + lastEvent.length) {
           rowGroup.add(event);
           added = true;
           break;
